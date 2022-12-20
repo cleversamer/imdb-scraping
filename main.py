@@ -1,16 +1,40 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+# import external modules
+from bs4 import BeautifulSoup
+import requests
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+try:
+    # requesting the IMDB website
+    url = "https://www.imdb.com/chart/top"
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    source = requests.get(url)
+    # throws an error in case of the URL has issues
+    source.raise_for_status()
+
+    # read and parse HTML file
+    soup = BeautifulSoup(source.text, "html.parser")
+
+    # reading movies table
+    movies = soup.find("tbody", class_="lister-list").find_all("tr")
+
+    for movie in movies:
+        # read child elements
+        titleColumnEl = movie.find("td", class_="titleColumn")
+        ratingColumnEl = movie.find("td", class_="ratingColumn")
+
+        # parse rank
+        rank = titleColumnEl.get_text(strip=True).split(".")[0]
+
+        # parse title
+        title = titleColumnEl.a.text
+
+        # parse year
+        year = titleColumnEl.span.text.strip("()")
+
+        # parse rating
+        rating = ratingColumnEl.strong.text
+
+        print(rank, title, year, rating)
+
+except Exception as e:
+    print(e)

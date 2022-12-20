@@ -1,7 +1,19 @@
 # import external modules
-from bs4 import BeautifulSoup
+import openpyxl
 import requests
+from bs4 import BeautifulSoup
 
+# create an Excel file
+excel = openpyxl.Workbook()
+
+# make sure that we are working on the active sheet
+sheet = excel.active
+
+# set the name of the sheet
+sheet.title = "Top Rated Movies"
+
+# create columns in the Excel sheets
+sheet.append(["Rank", "Title", "Year", "Rating"])
 
 try:
     # requesting the IMDB website
@@ -34,7 +46,10 @@ try:
         # parse rating
         rating = ratingColumnEl.strong.text
 
-        print(rank, title, year, rating)
-
+        # write a new row in the Excel sheet
+        sheet.append([rank, title, year, rating])
 except Exception as e:
     print(e)
+
+# save Excel file
+excel.save("IMDB Movie Ratings.xlsx")
